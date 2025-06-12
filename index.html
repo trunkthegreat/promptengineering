@@ -584,8 +584,9 @@
                 
                 if (category.prompts && category.prompts.length > 0) {
                     category.prompts.forEach((prompt, index) => {
+                        const actualIndex = prompt.originalIndex !== undefined ? prompt.originalIndex : index;
                         html += `
-                            <div class="prompt-thumbnail" onclick="showPromptDetail('${categoryKey}', ${index})">
+                            <div class="prompt-thumbnail" onclick="showPromptDetail('${categoryKey}', ${actualIndex})">
                                 <div>
                                     <h4>${prompt.title}</h4>
                                     <p>${prompt.description || ''}</p>
@@ -636,9 +637,15 @@
             const filteredDatabase = { categories: {} };
 
             for (const [categoryKey, category] of Object.entries(promptDatabase.categories)) {
-                const filteredPrompts = category.prompts.filter(prompt => {
+                const filteredPrompts = [];
+                category.prompts.forEach((prompt, originalIndex) => {
                     const searchText = (prompt.title + ' ' + prompt.description + ' ' + prompt.content).toLowerCase();
-                    return keywords.some(keyword => searchText.includes(keyword));
+                    if (keywords.some(keyword => searchText.includes(keyword))) {
+                        filteredPrompts.push({
+                            ...prompt,
+                            originalIndex: originalIndex
+                        });
+                    }
                 });
 
                 if (filteredPrompts.length > 0) {
