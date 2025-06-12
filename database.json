@@ -1,0 +1,16 @@
+{
+  "categories": {
+    "General": {
+      "name": "General",
+      "description": "General purpose prompts",
+      "prompts": [
+        {
+          "title": "Example Prompt",
+          "description": "Description",
+          "content": "Prompt text with [clipboard] placeholder"
+        }
+      ]
+    }
+  },
+  "version": "1.0"
+}
