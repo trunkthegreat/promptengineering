@@ -534,7 +534,7 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    const content = atob(data.content);
+                    const content = base64ToUtf8(data.content);
                     promptDatabase = JSON.parse(content);
                 } else if (response.status === 404) {
                     // Create default database structure
@@ -659,6 +659,14 @@
             }, 100);
         }
 
+        // UTF-8 encoding/decoding helpers for Unicode support
+        function utf8ToBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+        
+        function base64ToUtf8(str) {
+            return decodeURIComponent(escape(atob(str)));
+        }
         // Show prompt detail
         function showPromptDetail(categoryKey, promptIndex) {
             currentPrompt = { categoryKey, promptIndex };
@@ -855,7 +863,7 @@
                 }
 
                 // Update file
-                const content = btoa(JSON.stringify(promptDatabase, null, 2));
+                const content = utf8ToBase64(JSON.stringify(promptDatabase, null, 2));
                 const updateData = {
                     message: 'Update prompt database',
                     content: content
