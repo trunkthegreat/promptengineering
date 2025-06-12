@@ -15,6 +15,17 @@
           "content": "Tạo một podcast giải thích nội dung một cách thực sự chi tiết, càng chi tiết càng tốt. Đối tượng người nghe là các chuyên gia trong lĩnh vực trung tâm dữ liệu (data center). Podcast cần mở rộng ra ngoài khuôn khổ lý thuyết, bao gồm các ví dụ thực tiễn và các thông lệ tốt nhất (best practices). Thời lượng podcast không bị giới hạn, miễn là đủ để truyền tải đầy đủ mọi nội dung cần thiết. Sử dụng các phép ẩn dụ và ví von phù hợp để tăng tính hấp dẫn và cuốn hút cho người nghe."
         }
       ]
+    },
+    "ProgrammingIT": {
+      "name": "Programming IT",
+      "description": "",
+      "prompts": [
+        {
+          "title": "GitHub App Development Prompt",
+          "description": "Create App in Github database",
+          "content": "Replace [username], [repository-name], and [brand color] with your specific values before using this prompt.\n\nI need you to create a complete GitHub application with the following requirements:\n\n Basic Setup\n- Create an `index.html` file that works as the main interface\n- Include a `database.json` file to store data in hierarchical categories\n- Deploy on GitHub repository: `github/[username]/[repository-name]`\n- Add token authentication - users must enter a valid token before they can edit data\n\n Core Features\n- Search Function: Real-time search with fuzzy matching that works with any language (English, Vietnamese, Chinese, Japanese, etc.). Support multiple keywords separated by commas.\n- Display: Show data as collapsible thumbnail cards organized by categories. Make thumbnails thin/compact to fit many on screen.\n- Click to View: When users click a thumbnail, show a popup with full content and \"Copy\" button.\n- Smart Clipboard: For prompts with `{{placeholder}}` text, add a \"Replace with Clipboard\" button that substitutes the placeholder with current clipboard content.\n- Edit Mode: After token validation, allow users to add, edit, delete categories and items through the interface.\n\n Visual Design\n- Use [brand color] as primary color (e.g., jungle green 228B22)\n- Add checkered pattern background with glass morphism effects\n- High contrast text for readability\n- Thick, glossy borders around elements\n\n Critical Bug Prevention\n1. Unicode Support: Ensure all text input/output works correctly with non-Latin characters (Chinese, Japanese, Vietnamese, Arabic, etc.)\n2. Search Result Accuracy: When displaying search results, maintain correct item IDs so clicking thumbnails shows the right content\n3. Proper Encoding: Use UTF-8 encoding for all GitHub API operations\n\n Expected Deliverables\n- Complete `index.html` file with embedded CSS and JavaScript\n- Sample `database.json` with hierarchical structure\n- Working GitHub API integration for read/write operations\n- Responsive design that works on mobile and desktop\n\nImportant: Test the app with non-English text and verify search results match correctly when clicked. The application should be production-ready and deployable immediately to GitHub Pages."
+        }
+      ]
     }
   },
   "version": "1.0"
