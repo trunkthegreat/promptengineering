@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineering Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a4d3a 0%, #2d7a2d 50%, #1a4d3a 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #ffffff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-section {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .auth-input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            width: 300px;
+            margin: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .auth-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+        }
+
+        .search-section {
+            padding: 20px 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 18px;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .category {
+            margin-bottom: 20px;
+        }
+
+        .category-header {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .category-header h3 {
+            font-size: 1.4em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .expanded .category-content {
+            max-height: 2000px;
+        }
+
+        .prompts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            padding: 20px 0;
+        }
+
+        .prompt-thumbnail {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .prompt-thumbnail:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .prompt-thumbnail h4 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .prompt-thumbnail p {
+            font-size: 0.9em;
+            opacity: 0.8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 77, 58, 0.95);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .prompt-content {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid rgba(255, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #ffcccc;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid rgba(0, 255, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #ccffcc;
+        }
+
+        .management-section {
+            padding: 20px 30px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .management-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        textarea.form-input {
+            height: 120px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="glass-panel">
+            <div class="header">
+                <h1>🌿 Prompt Engineering Database</h1>
+                <p>Manage and search your prompt collection</p>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="auth-section" class="glass-panel">
+            <div class="auth-section">
+                <h2>Enter GitHub Access Token</h2>
+                <p>Please provide your GitHub personal access token to access the repository</p>
+                <input type="password" id="github-token" class="auth-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                <button onclick="authenticateToken()" class="btn">Connect to Repository</button>
+                <div id="auth-status"></div>
+            </div>
+        </div>
+
+        <!-- Main Application -->
+        <div id="main-app" class="hidden">
+            <!-- Search Section -->
+            <div class="glass-panel">
+                <div class="search-section">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search prompts... (use commas to separate keywords)">
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="glass-panel">
+                <div class="main-content">
+                    <div id="content-area">
+                        <div class="loading">Loading prompts...</div>
+                    </div>
+                </div>
+
+                <!-- Management Section -->
+                <div class="management-section">
+                    <div class="management-header">
+                        <h3>Management Tools</h3>
+                        <div>
+                            <button onclick="showAddCategoryModal()" class="btn btn-secondary">Add Category</button>
+                            <button onclick="showAddPromptModal()" class="btn btn-secondary">Add Prompt</button>
+                            <button onclick="saveToGitHub()" class="btn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt Detail Modal -->
+    <div id="prompt-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Prompt Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body">
+                <div class="prompt-content" id="prompt-text"></div>
+                <div class="modal-actions">
+                    <button onclick="copyPrompt()" class="btn">Copy Prompt</button>
+                    <button onclick="refreshClipboard()" class="btn btn-secondary">Refresh Clipboard</button>
+                    <button onclick="editPrompt()" class="btn btn-secondary">Edit</button>
+                    <button onclick="deletePrompt()" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-modal-title">Add/Edit</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div id="edit-modal-body">
+                <div class="form-group">
+                    <label for="edit-title">Title:</label>
+                    <input type="text" id="edit-title" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description:</label>
+                    <input type="text" id="edit-description" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit-content">Content:</label>
+                    <textarea id="edit-content" class="form-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-category">Category:</label>
+                    <select id="edit-category" class="form-input"></select>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="saveEdit()" class="btn">Save</button>
+                    <button onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let githubToken = '';
+        let promptDatabase = null;
+        let currentPrompt = null;
+        let editingPrompt = null;
+        let clipboardContent = '';
+        
+        const REPO_OWNER = 'trunkthegreat';
+        const REPO_NAME = 'promptengineering';
+        const DB_FILE = 'database.json';
+
+        // Initialize clipboard content
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            navigator.clipboard.readText().then(text => {
+                clipboardContent = text;
+            }).catch(() => {
+                console.log('Could not read clipboard');
+            });
+        }
+
+        // Authentication
+        async function authenticateToken() {
+            const token = document.getElementById('github-token').value.trim();
+            const statusDiv = document.getElementById('auth-status');  
+            
+            if (!token) {
+                showStatus(statusDiv, 'Please enter a GitHub token', 'error');
+                return;
+            }
+
+            try {
+                statusDiv.innerHTML = '<div class="loading">Verifying token...</div>';
+                
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    githubToken = token;
+                    showStatus(statusDiv, 'Authentication successful!', 'success');
+                    await loadDatabase();
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                } else {
+                    throw new Error('Invalid token or repository access denied');
+                }
+            } catch (error) {
+                showStatus(statusDiv, `Authentication failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Load database from GitHub
+        async function loadDatabase() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DB_FILE}`, {
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = atob(data.content);
+                    promptDatabase = JSON.parse(content);
+                } else if (response.status === 404) {
+                    // Create default database structure
+                    promptDatabase = {
+                        categories: {
+                            "General": {
+                                name: "General",
+                                description: "General purpose prompts",
+                                prompts: []
+                            }
+                        },
+                        version: "1.0"
+                    };
+                } else {
+                    throw new Error('Failed to load database');
+                }
+                
+                renderDatabase();
+                setupSearch();
+            } catch (error) {
+                document.getElementById('content-area').innerHTML = `<div class="error">Failed to load database: ${error.message}</div>`;
+            }
+        }
+
+        // Render database
+        function renderDatabase(filteredData = null) {
+            const contentArea = document.getElementById('content-area');
+            const dataToRender = filteredData || promptDatabase;
+            
+            if (!dataToRender || !dataToRender.categories) {
+                contentArea.innerHTML = '<div class="error">No data available</div>';
+                return;
+            }
+
+            let html = '';
+            
+            for (const [categoryKey, category] of Object.entries(dataToRender.categories)) {
+                html += `
+                    <div class="category">
+                        <div class="category-header" onclick="toggleCategory('${categoryKey}')">
+                            <h3>${category.name}</h3>
+                            <span class="expand-icon">▶</span>
+                        </div>
+                        <div class="category-content">
+                            <div class="prompts-grid">
+                `;
+                
+                if (category.prompts && category.prompts.length > 0) {
+                    category.prompts.forEach((prompt, index) => {
+                        html += `
+                            <div class="prompt-thumbnail" onclick="showPromptDetail('${categoryKey}', ${index})">
+                                <div>
+                                    <h4>${prompt.title}</h4>
+                                    <p>${prompt.description || ''}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="padding: 20px; text-align: center; opacity: 0.7;">No prompts in this category</div>';
+                }
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            contentArea.innerHTML = html;
+        }
+
+        // Toggle category
+        function toggleCategory(categoryKey) {
+            const category = document.querySelector(`[onclick="toggleCategory('${categoryKey}')"]`).parentElement;
+            category.classList.toggle('expanded');
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value);
+                }, 300);
+            });
+        }
+
+        function performSearch(query) {
+            if (!query.trim()) {
+                renderDatabase();
+                return;
+            }
+
+            const keywords = query.toLowerCase().split(',').map(k => k.trim()).filter(k => k);
+            const filteredDatabase = { categories: {} };
+
+            for (const [categoryKey, category] of Object.entries(promptDatabase.categories)) {
+                const filteredPrompts = category.prompts.filter(prompt => {
+                    const searchText = (prompt.title + ' ' + prompt.description + ' ' + prompt.content).toLowerCase();
+                    return keywords.some(keyword => searchText.includes(keyword));
+                });
+
+                if (filteredPrompts.length > 0) {
+                    filteredDatabase.categories[categoryKey] = {
+                        ...category,
+                        prompts: filteredPrompts
+                    };
+                }
+            }
+
+            renderDatabase(filteredDatabase);
+            
+            // Auto-expand categories with results
+            setTimeout(() => {
+                document.querySelectorAll('.category').forEach(cat => {
+                    cat.classList.add('expanded');
+                });
+            }, 100);
+        }
+
+        // Show prompt detail
+        function showPromptDetail(categoryKey, promptIndex) {
+            currentPrompt = { categoryKey, promptIndex };
+            const prompt = promptDatabase.categories[categoryKey].prompts[promptIndex];
+            
+            document.getElementById('modal-title').textContent = prompt.title;
+            document.getElementById('prompt-text').textContent = prompt.content;
+            document.getElementById('prompt-modal').style.display = 'block';
+        }
+
+        // Copy prompt to clipboard
+        async function copyPrompt() {
+            const prompt = promptDatabase.categories[currentPrompt.categoryKey].prompts[currentPrompt.promptIndex];
+            
+            try {
+                await navigator.clipboard.writeText(prompt.content);
+                showNotification('Prompt copied to clipboard!', 'success');
+            } catch (error) {
+                showNotification('Failed to copy to clipboard', 'error');
+            }
+        }
+
+        // Refresh clipboard in prompt
+        async function refreshClipboard() {
+            const prompt = promptDatabase.categories[currentPrompt.categoryKey].prompts[currentPrompt.promptIndex];
+            
+            // Update clipboard content
+            try {
+                clipboardContent = await navigator.clipboard.readText();
+            } catch (error) {
+                showNotification('Could not read clipboard', 'error');
+                return;
+            }
+
+            // Look for placeholder patterns like [clipboard], {clipboard}, etc.
+            const placeholderPatterns = [
+                /\[clipboard\]/gi,
+                /\{clipboard\}/gi,
+                /\<clipboard\>/gi,
+                /\[insert clipboard here\]/gi,
+                /\{insert clipboard here\}/gi,
+                /\<insert clipboard here\>/gi
+            ];
+
+            let updatedContent = prompt.content;
+            let hasPlaceholder = false;
+
+            placeholderPatterns.forEach(pattern => {
+                if (pattern.test(updatedContent)) {
+                    hasPlaceholder = true;
+                    updatedContent = updatedContent.replace(pattern, clipboardContent);
+                }
+            });
+
+            if (hasPlaceholder) {
+                try {
+                    await navigator.clipboard.writeText(updatedContent);
+                    showNotification('Prompt updated with clipboard content!', 'success');
+                    document.getElementById('prompt-text').textContent = updatedContent;
+                } catch (error) {
+                    showNotification('Failed to copy updated prompt', 'error');
+                }
+            } else {
+                showNotification('No clipboard placeholder found in prompt', 'error');
+            }
+        }
+
+        // Modal controls
+        function closeModal() {
+            document.getElementById('prompt-modal').style.display = 'none';
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            editingPrompt = null;
+        }
+
+        // Edit prompt
+        function editPrompt() {
+            const prompt = promptDatabase.categories[currentPrompt.categoryKey].prompts[currentPrompt.promptIndex];
+            editingPrompt = currentPrompt;
+            
+            document.getElementById('edit-modal-title').textContent = 'Edit Prompt';
+            document.getElementById('edit-title').value = prompt.title;
+            document.getElementById('edit-description').value = prompt.description || '';
+            document.getElementById('edit-content').value = prompt.content;
+            
+            populateCategorySelect();
+            document.getElementById('edit-category').value = currentPrompt.categoryKey;
+            
+            document.getElementById('edit-modal').style.display = 'block';
+            closeModal();
+        }
+
+        // Delete prompt
+        function deletePrompt() {
+            if (confirm('Are you sure you want to delete this prompt?')) {
+                promptDatabase.categories[currentPrompt.categoryKey].prompts.splice(currentPrompt.promptIndex, 1);
+                renderDatabase();
+                closeModal();
+                showNotification('Prompt deleted', 'success');
+            }
+        }
+
+        // Add category
+        function showAddCategoryModal() {
+            const categoryName = prompt('Enter category name:');
+            if (categoryName && categoryName.trim()) {
+                const key = categoryName.replace(/\s+/g, '');
+                if (!promptDatabase.categories[key]) {
+                    promptDatabase.categories[key] = {
+                        name: categoryName.trim(),
+                        description: '',
+                        prompts: []
+                    };
+                    renderDatabase();
+                    showNotification('Category added', 'success');
+                } else {
+                    showNotification('Category already exists', 'error');
+                }
+            }
+        }
+
+        // Add prompt
+        function showAddPromptModal() {
+            editingPrompt = null;
+            
+            document.getElementById('edit-modal-title').textContent = 'Add New Prompt';
+            document.getElementById('edit-title').value = '';
+            document.getElementById('edit-description').value = '';
+            document.getElementById('edit-content').value = '';
+            
+            populateCategorySelect();
+            
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        // Populate category select
+        function populateCategorySelect() {
+            const select = document.getElementById('edit-category');
+            select.innerHTML = '';
+            
+            for (const [key, category] of Object.entries(promptDatabase.categories)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = category.name;
+                select.appendChild(option);
+            }
+        }
+
+        // Save edit
+        function saveEdit() {
+            const title = document.getElementById('edit-title').value.trim();
+            const description = document.getElementById('edit-description').value.trim();
+            const content = document.getElementById('edit-content').value.trim();
+            const categoryKey = document.getElementById('edit-category').value;
+
+            if (!title || !content || !categoryKey) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const promptData = { title, description, content };
+
+            if (editingPrompt) {
+                // Update existing prompt
+                promptDatabase.categories[editingPrompt.categoryKey].prompts[editingPrompt.promptIndex] = promptData;
+                showNotification('Prompt updated', 'success');
+            } else {
+                // Add new prompt
+                promptDatabase.categories[categoryKey].prompts.push(promptData);
+                showNotification('Prompt added', 'success');
+            }
+
+            renderDatabase();
+            closeEditModal();
+        }
+
+        // Save to GitHub
+        async function saveToGitHub() {
+            try {
+                // Get current file to get SHA
+                const getResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DB_FILE}`, {
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                let sha = null;
+                if (getResponse.ok) {
+                    const fileData = await getResponse.json();
+                    sha = fileData.sha;
+                }
+
+                // Update file
+                const content = btoa(JSON.stringify(promptDatabase, null, 2));
+                const updateData = {
+                    message: 'Update prompt database',
+                    content: content
+                };
+
+                if (sha) {
+                    updateData.sha = sha;
+                }
+
+                const updateResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DB_FILE}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (updateResponse.ok) {
+                    showNotification('Changes saved to GitHub!', 'success');
+                } else {
+                    throw new Error('Failed to save to GitHub');
+                }
+            } catch (error) {
+                showNotification(`Save failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Utility functions
+        function showStatus(element, message, type) {
+            element.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `${type} notification`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '10000';
+            notification.style.borderRadius = '10px';
+            notification.style.padding = '15px';
+            notification.style.minWidth = '250px';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeEditModal();
+            }
+        });
+
+        // Auto-expand first category on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const firstCategory = document.querySelector('.category');
+                if (firstCategory) {
+                    firstCategory.classList.add('expanded');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
