@@ -8,6 +8,11 @@
           "title": "Example Prompt",
           "description": "Description",
           "content": "Prompt text with [clipboard] placeholder"
+        },
+        {
+          "title": "Podcast-Vietnamese",
+          "description": "",
+          "content": "Tạo một podcast giải thích nội dung một cách thực sự chi tiết, càng chi tiết càng tốt. Đối tượng người nghe là các chuyên gia trong lĩnh vực trung tâm dữ liệu (data center). Podcast cần mở rộng ra ngoài khuôn khổ lý thuyết, bao gồm các ví dụ thực tiễn và các thông lệ tốt nhất (best practices). Thời lượng podcast không bị giới hạn, miễn là đủ để truyền tải đầy đủ mọi nội dung cần thiết. Sử dụng các phép ẩn dụ và ví von phù hợp để tăng tính hấp dẫn và cuốn hút cho người nghe."
         }
       ]
     }
