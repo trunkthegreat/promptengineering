@@ -13,6 +13,11 @@
           "title": "Podcast-Vietnamese",
           "description": "",
           "content": "Tạo một podcast về [CHỦ ĐỀ HOẶC NỘI DUNG] giải thích một cách thực sự chi tiết, càng chi tiết càng tốt. \nĐối tượng người nghe là [ĐỐI TƯỢNG MỤC TIÊU]. \nPodcast cần mở rộng ra ngoài khuôn khổ lý thuyết, bao gồm các ví dụ thực tiễn và các thông lệ tốt nhất (best practices). \nThời lượng podcast không bị giới hạn, miễn là đủ để truyền tải đầy đủ mọi nội dung cần thiết. \nSử dụng các phép ẩn dụ và ví von phù hợp để tăng tính hấp dẫn và cuốn hút cho người nghe."
+        },
+        {
+          "title": "Flask (Lite)",
+          "description": "",
+          "content": "You are an expert full-stack architect. Generate a minimal, modular Flask project that meets these core goals:\n\n1. **Principles**  \n   - Follow DRY, KISS and SOLID.  \n   - Keep file count low; organize by feature modules.\n\n2. **Data & Media**  \n   - Store structured metadata in a database (SQLite/Postgres).  \n   - Place uploads in an attachments directory with clear record-to-file mapping.  \n   - Support UTF-8 for non-Latin filenames and content.\n\n3. **UI Structure**  \n   - SBMF layout: collapsible sidebar + responsive main area.  \n   - CRYSTAL design: generous whitespace, single font family (with non-Latin support), subtle transparency and shadows, a cohesive accent color.\n\n4. **Essential Features**  \n   - CRUD + batch operations for records (Create, Read, Update, Delete).  \n   - Media upload/embed with secure validation and thumbnails.  \n   - Dynamic fields stored flexibly (e.g. JSON).  \n   - Multi-view UI: tabs, list/grid/table, real-time search/filter.  \n   - Settings panel for timeout configuration.\n\n5. **Deployment**  \n   - RSR one-click installer: a simple launcher for Windows (or cross-platform), automated setup, database initialization, and auto-launch.\n\n6. **Quality & Behavior**  \n   - Asynchronous server calls so UI remains responsive.  \n   - Input sanitization and UTF-8 encoding everywhere.  \n   - Clear module boundaries so teams can plug-and-play features.  \n   - Basic unit tests for core paths and non-Latin support.\n\nReturn a concise directory scaffold, key configuration files, and sample code stubs illustrating each requirement."
         }
       ]
     },
