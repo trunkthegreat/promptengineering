@@ -129,28 +129,56 @@
 
         .category {
             margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
         }
 
         .category-header {
             background: rgba(255, 255, 255, 0.15);
             padding: 15px 20px;
-            border-radius: 12px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
 
         .category-header:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
         }
 
-        .category-header h3 {
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-title h3 {
             font-size: 1.4em;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .category-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
         }
 
         .expand-icon {
@@ -166,17 +194,35 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .expanded .category-content {
             max-height: 2000px;
         }
 
+        .drop-zone {
+            min-height: 60px;
+            padding: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            margin: 10px;
+            border-radius: 10px;
+            text-align: center;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            opacity: 1;
+        }
+
         .prompts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 15px;
-            padding: 20px 0;
+            padding: 20px;
         }
 
         .prompt-thumbnail {
@@ -184,18 +230,25 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
             padding: 15px;
-            cursor: pointer;
+            cursor: grab;
             transition: all 0.3s ease;
             height: 80px;
             display: flex;
             align-items: center;
             backdrop-filter: blur(5px);
+            user-select: none;
         }
 
         .prompt-thumbnail:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .prompt-thumbnail.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            cursor: grabbing;
         }
 
         .prompt-thumbnail h4 {
@@ -313,7 +366,7 @@
 
         .management-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -324,6 +377,10 @@
 
         .btn-danger {
             background: linear-gradient(135deg, #f44336, #d32f2f);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
         }
 
         .form-group {
@@ -362,7 +419,6 @@
             line-height: 1.4;
         }
 
-        /* Placeholder Input Modal Styles */
         .placeholder-modal-content {
             max-width: 90%;
             width: 900px;
@@ -429,6 +485,41 @@
             font-size: 18px;
             color: #e8f5e8;
             font-weight: bold;
+        }
+
+        .category-modal-content {
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .delete-options {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .delete-options h4 {
+            margin-bottom: 15px;
+            color: #ffcccc;
+        }
+
+        .delete-option {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .delete-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .delete-option input[type="radio"] {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -522,7 +613,7 @@
         </div>
     </div>
 
-    <!-- Add/Edit Modal -->
+    <!-- Add/Edit Prompt Modal -->
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -539,7 +630,7 @@
                     <input type="text" id="edit-description" class="form-input">
                 </div>
                 <div class="form-group">
-                    <label for="edit-content">Content:</label>
+                    <label for="edit-content">Content (use [[placeholder]] for placeholders):</label>
                     <textarea id="edit-content" class="form-input"></textarea>
                 </div>
                 <div class="form-group">
@@ -554,15 +645,77 @@
         </div>
     </div>
 
+    <!-- Category Management Modal -->
+    <div id="category-modal" class="modal">
+        <div class="modal-content category-modal-content">
+            <div class="modal-header">
+                <h2 id="category-modal-title">Category Management</h2>
+                <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <div id="category-modal-body">
+                <div class="form-group">
+                    <label for="category-name">Category Name:</label>
+                    <input type="text" id="category-name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="category-description">Description:</label>
+                    <input type="text" id="category-description" class="form-input">
+                </div>
+                <div class="modal-actions">
+                    <button onclick="saveCategoryEdit()" class="btn">Save</button>
+                    <button onclick="closeCategoryModal()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Category Modal -->
+    <div id="delete-category-modal" class="modal">
+        <div class="modal-content category-modal-content">
+            <div class="modal-header">
+                <h2>Delete Category</h2>
+                <button class="close-btn" onclick="closeDeleteCategoryModal()">&times;</button>
+            </div>
+            <div id="delete-category-body">
+                <p>What would you like to do with the <span id="prompt-count"></span> prompts in this category?</p>
+                <div class="delete-options">
+                    <h4>Choose an option:</h4>
+                    <div class="delete-option">
+                        <input type="radio" name="delete-option" value="delete-all" id="delete-all">
+                        <label for="delete-all">Delete all prompts in this category</label>
+                    </div>
+                    <div class="delete-option">
+                        <input type="radio" name="delete-option" value="move-general" id="move-general" checked>
+                        <label for="move-general">Move all prompts to "General" category</label>
+                    </div>
+                    <div class="delete-option">
+                        <input type="radio" name="delete-option" value="choose-category" id="choose-category">
+                        <label for="choose-category">Move all prompts to another category:</label>
+                        <select id="target-category" class="form-input" style="margin-top: 10px;">
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="confirmDeleteCategory()" class="btn btn-danger">Delete Category</button>
+                    <button onclick="closeDeleteCategoryModal()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let githubToken = '';
         let promptDatabase = null;
         let currentPrompt = null;
         let editingPrompt = null;
+        let editingCategory = null;
+        let deletingCategory = null;
         let clipboardContent = '';
         let currentPlaceholders = [];
         let currentPromptContent = '';
+        let draggedPrompt = null;
         
         const REPO_OWNER = 'trunkthegreat';
         const REPO_NAME = 'promptengineering';
@@ -664,10 +817,19 @@
                 html += `
                     <div class="category">
                         <div class="category-header" onclick="toggleCategory('${categoryKey}')">
-                            <h3>${category.name}</h3>
+                            <div class="category-title">
+                                <h3>${category.name}</h3>
+                                <span class="category-actions" onclick="event.stopPropagation()">
+                                    <button class="category-btn" onclick="editCategory('${categoryKey}')" title="Edit Category">✏️</button>
+                                    <button class="category-btn" onclick="deleteCategory('${categoryKey}')" title="Delete Category">🗑️</button>
+                                </span>
+                            </div>
                             <span class="expand-icon">▶</span>
                         </div>
                         <div class="category-content">
+                            <div class="drop-zone" ondrop="dropPrompt(event, '${categoryKey}')" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+                                Drop prompts here to move them to this category
+                            </div>
                             <div class="prompts-grid">
                 `;
                 
@@ -675,7 +837,11 @@
                     category.prompts.forEach((prompt, index) => {
                         const actualIndex = prompt.originalIndex !== undefined ? prompt.originalIndex : index;
                         html += `
-                            <div class="prompt-thumbnail" onclick="showPromptDetail('${categoryKey}', ${actualIndex})">
+                            <div class="prompt-thumbnail" 
+                                 draggable="true" 
+                                 ondragstart="dragStart(event, '${categoryKey}', ${actualIndex})"
+                                 ondragend="dragEnd(event)"
+                                 onclick="showPromptDetail('${categoryKey}', ${actualIndex})">
                                 <div>
                                     <h4>${prompt.title}</h4>
                                     <p>${prompt.description || ''}</p>
@@ -695,6 +861,169 @@
             }
             
             contentArea.innerHTML = html;
+        }
+
+        // Drag and Drop Functions
+        function dragStart(event, categoryKey, promptIndex) {
+            draggedPrompt = { categoryKey, promptIndex };
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragEnd(event) {
+            event.target.classList.remove('dragging');
+            draggedPrompt = null;
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function dragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function dropPrompt(event, targetCategoryKey) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            
+            if (!draggedPrompt || draggedPrompt.categoryKey === targetCategoryKey) {
+                return;
+            }
+
+            // Move the prompt from source to target category
+            const sourceCategory = promptDatabase.categories[draggedPrompt.categoryKey];
+            const targetCategory = promptDatabase.categories[targetCategoryKey];
+            const prompt = sourceCategory.prompts[draggedPrompt.promptIndex];
+
+            // Remove from source
+            sourceCategory.prompts.splice(draggedPrompt.promptIndex, 1);
+            
+            // Add to target
+            targetCategory.prompts.push(prompt);
+
+            // Re-render
+            renderDatabase();
+            showNotification(`Moved "${prompt.title}" to ${targetCategory.name}`, 'success');
+        }
+
+        // Category Management Functions
+        function editCategory(categoryKey) {
+            editingCategory = categoryKey;
+            const category = promptDatabase.categories[categoryKey];
+            
+            document.getElementById('category-modal-title').textContent = 'Edit Category';
+            document.getElementById('category-name').value = category.name;
+            document.getElementById('category-description').value = category.description || '';
+            document.getElementById('category-modal').style.display = 'block';
+        }
+
+        function deleteCategory(categoryKey) {
+            const category = promptDatabase.categories[categoryKey];
+            const promptCount = category.prompts.length;
+            
+            if (Object.keys(promptDatabase.categories).length === 1) {
+                showNotification('Cannot delete the only remaining category', 'error');
+                return;
+            }
+            
+            deletingCategory = categoryKey;
+            document.getElementById('prompt-count').textContent = `${promptCount}`;
+            
+            // Populate target category dropdown
+            const targetSelect = document.getElementById('target-category');
+            targetSelect.innerHTML = '';
+            for (const [key, cat] of Object.entries(promptDatabase.categories)) {
+                if (key !== categoryKey) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = cat.name;
+                    targetSelect.appendChild(option);
+                }
+            }
+            
+            document.getElementById('delete-category-modal').style.display = 'block';
+        }
+
+        function confirmDeleteCategory() {
+            const selectedOption = document.querySelector('input[name="delete-option"]:checked').value;
+            const category = promptDatabase.categories[deletingCategory];
+            const prompts = [...category.prompts]; // Copy prompts array
+            
+            switch (selectedOption) {
+                case 'delete-all':
+                    // Just delete the category (prompts will be deleted with it)
+                    break;
+                    
+                case 'move-general':
+                    // Move prompts to General category
+                    if (!promptDatabase.categories['General']) {
+                        promptDatabase.categories['General'] = {
+                            name: 'General',
+                            description: 'General purpose prompts',
+                            prompts: []
+                        };
+                    }
+                    promptDatabase.categories['General'].prompts.push(...prompts);
+                    break;
+                    
+                case 'choose-category':
+                    // Move prompts to selected category
+                    const targetKey = document.getElementById('target-category').value;
+                    promptDatabase.categories[targetKey].prompts.push(...prompts);
+                    break;
+            }
+            
+            // Delete the category
+            delete promptDatabase.categories[deletingCategory];
+            
+            renderDatabase();
+            closeDeleteCategoryModal();
+            showNotification(`Category deleted`, 'success');
+        }
+
+        function saveCategoryEdit() {
+            const name = document.getElementById('category-name').value.trim();
+            const description = document.getElementById('category-description').value.trim();
+
+            if (!name) {
+                showNotification('Please enter a category name', 'error');
+                return;
+            }
+
+            if (editingCategory) {
+                // Update existing category
+                promptDatabase.categories[editingCategory].name = name;
+                promptDatabase.categories[editingCategory].description = description;
+                showNotification('Category updated', 'success');
+            } else {
+                // Add new category
+                const key = name.replace(/\s+/g, '');
+                if (promptDatabase.categories[key]) {
+                    showNotification('Category already exists', 'error');
+                    return;
+                }
+                promptDatabase.categories[key] = {
+                    name: name,
+                    description: description,
+                    prompts: []
+                };
+                showNotification('Category added', 'success');
+            }
+
+            renderDatabase();
+            closeCategoryModal();
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('category-modal').style.display = 'none';
+            editingCategory = null;
+        }
+
+        function closeDeleteCategoryModal() {
+            document.getElementById('delete-category-modal').style.display = 'none';
+            deletingCategory = null;
         }
 
         // Toggle category
@@ -782,13 +1111,13 @@
             document.getElementById('prompt-modal').style.display = 'block';
         }
 
-        // Enhanced copy prompt with placeholder detection
+        // Enhanced copy prompt with placeholder detection (now using double brackets)
         async function copyPrompt() {
             const prompt = promptDatabase.categories[currentPrompt.categoryKey].prompts[currentPrompt.promptIndex];
             const content = prompt.content;
             
-            // Scan for placeholders in brackets [placeholder]
-            const placeholderRegex = /\[([^\]]+)\]/g;
+            // Scan for placeholders in double brackets [[placeholder]]
+            const placeholderRegex = /\[\[([^\]]+)\]\]/g;
             const placeholders = [];
             let match;
             
@@ -832,11 +1161,11 @@
                         <textarea 
                             id="placeholder-${index}" 
                             class="placeholder-input" 
-                            placeholder="Enter content for [${placeholder}]..."
+                            placeholder="Enter content for [[${placeholder}]]..."
                             data-placeholder="${placeholder}"
                         ></textarea>
                         <div class="placeholder-hint">
-                            This will replace all instances of [${placeholder}] in the prompt
+                            This will replace all instances of [[${placeholder}]] in the prompt
                         </div>
                     </div>
                 `;
@@ -857,12 +1186,12 @@
                 const replacement = input.value.trim();
                 
                 if (!replacement) {
-                    showNotification(`Please fill in content for [${placeholder}]`, 'error');
+                    showNotification(`Please fill in content for [[${placeholder}]]`, 'error');
                     return;
                 }
                 
-                // Replace all instances of this placeholder
-                const placeholderRegex = new RegExp(`\\[${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]`, 'g');
+                // Replace all instances of this placeholder (double brackets)
+                const placeholderRegex = new RegExp(`\\[\\[${placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]\\]`, 'g');
                 finalContent = finalContent.replace(placeholderRegex, replacement);
             }
             
@@ -896,12 +1225,12 @@
                 return;
             }
 
-            // Look for placeholder patterns like [clipboard], {clipboard}, etc.
+            // Look for placeholder patterns like [[clipboard]], {clipboard}, etc.
             const placeholderPatterns = [
-                /\[clipboard\]/gi,
+                /\[\[clipboard\]\]/gi,
                 /\{clipboard\}/gi,
                 /\<clipboard\>/gi,
-                /\[insert clipboard here\]/gi,
+                /\[\[insert clipboard here\]\]/gi,
                 /\{insert clipboard here\}/gi,
                 /\<insert clipboard here\>/gi
             ];
@@ -968,21 +1297,12 @@
 
         // Add category
         function showAddCategoryModal() {
-            const categoryName = prompt('Enter category name:');
-            if (categoryName && categoryName.trim()) {
-                const key = categoryName.replace(/\s+/g, '');
-                if (!promptDatabase.categories[key]) {
-                    promptDatabase.categories[key] = {
-                        name: categoryName.trim(),
-                        description: '',
-                        prompts: []
-                    };
-                    renderDatabase();
-                    showNotification('Category added', 'success');
-                } else {
-                    showNotification('Category already exists', 'error');
-                }
-            }
+            editingCategory = null;
+            
+            document.getElementById('category-modal-title').textContent = 'Add New Category';
+            document.getElementById('category-name').value = '';
+            document.getElementById('category-description').value = '';
+            document.getElementById('category-modal').style.display = 'block';
         }
 
         // Add prompt
@@ -1118,6 +1438,8 @@
                 closeModal();
                 closeEditModal();
                 closePlaceholderModal();
+                closeCategoryModal();
+                closeDeleteCategoryModal();
             }
         });
 
