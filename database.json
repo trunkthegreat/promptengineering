@@ -58,7 +58,7 @@
         {
           "title": "Code Changes",
           "description": "",
-          "content": "Study the following code to make the following changes:\n<Change Requirements>\n[[Change Requirements]]\n</Change Requirements>\n\n<Original Code>\n[[Old Code Here]]\n</Original Code>\nDo not rewrite the entire code. Teach me where to search for code that must be modified, how to replace old codes with new ones, and how to modify the code."
+          "content": "Study the following code to make the following changes:\n<Change Requirements>\n[[Change Requirements]]\n</Change Requirements>\n\n<Original Code>\n[[Old Code Here]]\n</Original Code>\nDo not rewrite the entire code. Teach me where to search for code that must be modified, how to replace old codes with new ones, and how to modify the code.\nIdeal answer shall be like this:\n - Find [this code].\n - Replace it with [this block-by-block code]"
         }
       ]
     },
