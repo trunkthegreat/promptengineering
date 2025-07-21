@@ -85,6 +85,11 @@
           "title": "Commercial Risk Assessment",
           "description": "",
           "content": "CONTRACT RISK ASSESSMENT AND COMPLIANCE REVIEW\nPlease conduct a comprehensive legal and commercial risk analysis of the attached contract document against our established compliance framework. Your assessment should include:\n1. COMPLIANCE ANALYSIS\nCross-reference all contract terms against our legal guardrails database \nIdentify any regulatory violations, policy breaches, or non-compliance issues \nFlag terms that conflict with CBRE's standard contractual practices \n2. COMMERCIAL RISK EVALUATION\nAnalyze contract provisions that may be commercially disadvantageous to CBRE \nIdentify clauses with unfavorable financial implications, liability exposures, or operational constraints \nAssess terms that could impact CBRE's competitive position or service delivery capabilities \n3. RISK CATEGORIZATION Classify all identified issues using the following risk matrix:\nCRITICAL: Immediate legal/financial exposure requiring urgent attention \nHIGH: Significant commercial disadvantage or compliance concern \nMEDIUM: Moderate risk requiring negotiation or mitigation \nLOW: Minor issues for monitoring or future consideration \n4. DELIVERABLE FORMAT\nExecutive summary of key findings \nDetailed risk register with specific clause references \nRecommended actions for each identified risk level \nSuggested contract amendments or negotiation points \nPlease ensure all findings are supported by specific contract language citations and applicable legal/policy references.\n\n<Terms and conditions to be revised are shown as below>\n[[Terms and conditions]]"
+        },
+        {
+          "title": "Commercial RA (Solutions)",
+          "description": "",
+          "content": "Based on the provided risk analysis, please generate new or revised contractual terms and conditions that align with existing contract frameworks. Ensure the proposed modifications adhere to the following requirements:\n1. Maintain consistency with established language patterns and terminology used in the original contract\n2. Replicate the linguistic style, tone, and structural conventions of the existing terms\n3. Format all new additions or modifications using bold italics to clearly distinguish them from original content\n4. Preserve the maximum amount of original contractual language possible\n5. Implement only essential changes necessary to address identified risks\nPlease prioritize minimal intervention while ensuring comprehensive risk mitigation through strategically placed contractual enhancements."
         }
       ]
     },
@@ -98,11 +103,6 @@
           "content": "You are an expert English teacher. Your task is to take the raw, spoken English provided in brackets and produce a polished version that:\n\n- Corrects all grammatical errors and refines vocabulary.\n- Improves clarity and logical flow, making only minimal rearrangements.\n- Preserves the speaker’s original thought process, style, and intent.\n\nAlways receive input in the form:\nContent = {{[[ ]]}}\n\nAnd return only the revised sentence or paragraph."
         }
       ]
-    },
-    "CommercialManager": {
-      "name": "Commercial Manager",
-      "description": "",
-      "prompts": []
     }
   },
   "version": "1.0"
